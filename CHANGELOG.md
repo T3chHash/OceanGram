@@ -1,3 +1,10 @@
+## 1.0.1 - Smart CLI Menu & Live Update Checker
+
+### ⚡ CLI & Update Features
+- 🔔 Automatic GitHub update detection: typing `oceangram` notifies the administrator in English if a new release/commit is available
+- ⌨️ Interactive numbered control menu: press `3` to automatically pull updates, rebuild containers, and restart services
+- 📊 Instant status (`1`), live logs (`2`), restart (`4`), stop (`5`), start (`6`), and SSL cert renew (`7`)
+
 ## 1.0.0 - OceanGram Official Release
 
 ### ✨ Visual Redesign & Telegram-Grade Animations

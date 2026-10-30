@@ -377,40 +377,143 @@ else
   DC="docker compose $COMPOSE_PROFILE"
 fi
 
-case "\${1:-status}" in
-  start)
-    echo "Starting OceanGram..."
-    \$DC up -d
+check_updates() {
+  git fetch origin main --quiet 2>/dev/null || true
+  local current_commit remote_commit
+  current_commit="\$(git rev-parse HEAD 2>/dev/null || true)"
+  remote_commit="\$(git rev-parse origin/main 2>/dev/null || true)"
+  if [[ -n "\$current_commit" && -n "\$remote_commit" && "\$current_commit" != "\$remote_commit" ]]; then
+    return 0
+  fi
+  return 1
+}
+
+do_update() {
+  echo -e "\033[1;36m[OceanGram]\033[0m Updating OceanGram to the latest release..."
+  git fetch origin main
+  git reset --hard origin/main
+  \$DC build
+  \$DC up -d
+  # Refresh CLI wrapper if updated
+  if [[ -f install.sh ]]; then
+    bash install.sh --update-cli-only 2>/dev/null || true
+  fi
+  echo -e "\033[1;32m[OceanGram] ✓ OceanGram successfully updated to the latest release!\033[0m"
+}
+
+show_interactive_menu() {
+  local version
+  version="\$(cat VERSION 2>/dev/null || echo '1.0.0')"
+
+  clear 2>/dev/null || true
+  cat << "BANNER"
+  ___                         ____                 
+ / _ \  ___ ___  __ _ _ __   / ___|_ __ __ _ _ __  
+| | | |/ __/ _ \/ _` | '_ \ | |  _| '__/ _` | '_ \ 
+| |_| | (_|  __/ (_| | | | || |_| | | | (_| | | | |
+ \___/ \___\___|\__,_|_| |_(_)____|_|  \__,_|_| |_|
+       Modern Secure Real-Time Messenger
+BANNER
+  echo -e "\033[1;36m─────────────────────────────────────────────────────────────\033[0m"
+
+  if check_updates; then
+    echo -e "\033[1;33m"
+    echo "  ╔═══════════════════════════════════════════════════════════╗"
+    echo "  ║  🔔 UPDATE AVAILABLE!                                     ║"
+    echo "  ║  A new version of OceanGram is available on GitHub.       ║"
+    echo "  ║  Press [3] below to upgrade automatically!                ║"
+    echo "  ╚═══════════════════════════════════════════════════════════╝"
+    echo -e "\033[0m"
+  else
+    echo -e "\033[1;32m  ✓ OceanGram is running latest version (v\${version})\033[0m\n"
+  fi
+
+  echo "Select an option:"
+  echo -e "  \033[1m1)\033[0m 📊 Status        - View container status & health"
+  echo -e "  \033[1m2)\033[0m 📜 Logs          - Stream live application logs"
+  echo -e "  \033[1;33m3) 🚀 Update Now     - Pull latest version & rebuild automatically\033[0m"
+  echo -e "  \033[1m4)\033[0m 🔄 Restart       - Restart all OceanGram services"
+  echo -e "  \033[1m5)\033[0m 🛑 Stop          - Stop all containers"
+  echo -e "  \033[1m6)\033[0m ▶️  Start         - Start all containers"
+  echo -e "  \033[1m7)\033[0m 🔐 SSL Renew     - Renew Let's Encrypt certificates"
+  echo -e "  \033[1m0)\033[0m ❌ Exit"
+  echo -e "\033[1;36m─────────────────────────────────────────────────────────────\033[0m"
+  read -r -p "Enter your choice [0-7]: " action_choice
+
+  case "\$action_choice" in
+    1|status)
+      \$DC ps
+      ;;
+    2|logs)
+      \$DC logs -f --tail=100
+      ;;
+    3|update)
+      do_update
+      ;;
+    4|restart)
+      echo "Restarting OceanGram..."
+      \$DC down
+      \$DC up -d
+      echo "Restarted successfully."
+      ;;
+    5|stop)
+      echo "Stopping OceanGram..."
+      \$DC down
+      ;;
+    6|start)
+      echo "Starting OceanGram..."
+      \$DC up -d
+      ;;
+    7|cert-renew)
+      echo "Renewing certificates..."
+      certbot renew --quiet
+      docker restart oceangram-nginx 2>/dev/null || true
+      echo "SSL certificates refreshed."
+      ;;
+    0|q|exit)
+      exit 0
+      ;;
+    *)
+      echo "Invalid option. Exiting."
+      exit 1
+      ;;
+  esac
+}
+
+case "\${1:-}" in
+  ""|menu)
+    show_interactive_menu
     ;;
-  stop)
-    echo "Stopping OceanGram..."
-    \$DC down
+  1|status)
+    \$DC ps
     ;;
-  restart)
+  2|logs)
+    shift
+    \$DC logs -f "\$@"
+    ;;
+  3|update)
+    do_update
+    ;;
+  4|restart)
     echo "Restarting OceanGram..."
     \$DC down
     \$DC up -d
     ;;
-  status)
-    \$DC ps
+  5|stop)
+    echo "Stopping OceanGram..."
+    \$DC down
     ;;
-  logs)
-    shift
-    \$DC logs -f "\$@"
-    ;;
-  update)
-    echo "Updating OceanGram to the latest release..."
-    git pull origin main
-    \$DC build --no-cache
+  6|start)
+    echo "Starting OceanGram..."
     \$DC up -d
-    echo "OceanGram successfully updated!"
     ;;
-  cert-renew)
+  7|cert-renew)
     echo "Renewing certificates..."
     certbot renew --quiet
+    docker restart oceangram-nginx 2>/dev/null || true
     ;;
   *)
-    echo "Usage: oceangram {start|stop|restart|status|logs|update|cert-renew}"
+    echo "Usage: oceangram [menu|status|logs|update|restart|stop|start|cert-renew]"
     exit 1
     ;;
 esac
@@ -442,6 +545,11 @@ start_services() {
 }
 
 main() {
+  if [[ "${1:-}" == "--update-cli-only" ]]; then
+    setup_cli
+    exit 0
+  fi
+
   print_banner
 
   if [[ $EUID -ne 0 ]]; then
