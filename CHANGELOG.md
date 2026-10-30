@@ -1,3 +1,15 @@
+## 1.1.0 - Telegram-Style Message Reaction Badges & Obsidian Theme
+
+### ✨ Real Telegram-Style Message Reaction Badges
+- 💬 Reacting to a message now attaches the interactive emoji reaction pill directly below the message bubble
+- ⚡ Multiple reactions with counts, user toggle, bounce animation, and reactive store persistence
+- 🎭 Clicking existing reaction badge on message increments/toggles reaction immediately
+
+### 💎 Luxury Obsidian Dark Aesthetic (Anti-Childish Overhaul)
+- 🌌 Replaced washed-out light green pastel look with deep oceanic obsidian (`#070a13`, `#090e18`)
+- 🎨 Refined typography, crisp glassmorphic borders, and high-contrast readable message cards
+- 🖤 Defaulted to luxury dark mode for instant professional feel
+
 ## 1.0.1 - Smart CLI Menu & Live Update Checker
 
 ### ⚡ CLI & Update Features

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { toggleMessageReaction } from "../../utils/reactionsStore.js";
 
 const SCREEN_GAP = 12;
 
@@ -145,7 +146,10 @@ export default function AppContextMenu({ menu, onClose }) {
               className="flex h-8 w-8 items-center justify-center rounded-full text-lg transition-transform duration-150 hover:scale-135 hover:-translate-y-1 active:scale-95 cursor-pointer"
               onClick={() => {
                 setActiveReaction(emoji);
-                setTimeout(() => onClose?.(), 220);
+                if (menu?.messageId) {
+                  toggleMessageReaction(menu.messageId, emoji);
+                }
+                setTimeout(() => onClose?.(), 180);
               }}
               title={emoji}
             >

@@ -38,6 +38,7 @@ import { resolveForwardedTarget } from "../../../utils/forwardOrigin.js";
 import Avatar from "../../common/Avatar.jsx";
 import UserRoleBadge from "../../common/UserRoleBadge.jsx";
 import VerifiedBadge from "../../common/VerifiedBadge.jsx";
+import { useMessageReactions, toggleMessageReaction } from "../../../utils/reactionsStore.js";
 import Tooltip from "../../common/Tooltip.jsx";
 
 const MAX_MESSAGE_HTML_CACHE_ENTRIES = 800;
@@ -272,6 +273,7 @@ export const MessageItem = memo(function MessageItem({
       ? Boolean(forwardedFromLabel)
       : Boolean(forwardedFromLabel);
   const messageFiles = Array.isArray(msg.files) ? msg.files : [];
+  const messageReactions = useMessageReactions(msg.id);
   const hasFiles = messageFiles.length > 0;
   const generatedSummaryText = hasFiles
     ? summarizeFiles(messageFiles, String(msg?._uploadType || "").toLowerCase())
@@ -1518,6 +1520,28 @@ export const MessageItem = memo(function MessageItem({
                 >
                   <Forward size={15} className="icon-anim-pop" />
                 </button>
+              ) : null}
+              {/* Telegram-style Message Reaction Badges */}
+              {messageReactions && messageReactions.length > 0 ? (
+                <div className={`mt-1.5 flex flex-wrap gap-1 ${isOwn ? "justify-end" : "justify-start"}`}>
+                  {messageReactions.map(({ emoji, count }) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleMessageReaction(msg.id, emoji);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-slate-900/80 px-2.5 py-0.5 text-xs font-semibold text-sky-200 backdrop-blur-md transition-all duration-150 hover:scale-110 active:scale-90 shadow-sm cursor-pointer"
+                      title="Toggle reaction"
+                    >
+                      <span className="text-sm leading-none">{emoji}</span>
+                      {count > 1 ? (
+                        <span className="text-[11px] font-bold text-sky-300">{count}</span>
+                      ) : null}
+                    </button>
+                  ))}
+                </div>
               ) : null}
             </ContextMenuSurface>
           )}

@@ -8,29 +8,29 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#0284c7" />
+    <meta name="theme-color" content="#070a13" />
     <style>
       html,
       body {
-        background: #f8fafc;
+        background: #070a13;
       }
       html.sb-preload-dark,
       html.sb-preload-dark body {
-        background: #030712;
+        background: #070a13;
       }
     </style>
     <script>
       (function () {
         try {
           var stored = localStorage.getItem("oceangram-theme") || localStorage.getItem("songbird-theme");
-          var isDark = stored === "dark";
+          var isDark = stored !== "light";
           if (isDark) {
             var root = document.documentElement;
             root.classList.add("dark", "sb-preload-dark");
             root.style.colorScheme = "dark";
-            root.style.backgroundColor = "#030712";
+            root.style.backgroundColor = "#070a13";
             var meta = document.querySelector('meta[name="theme-color"]');
-            if (meta) meta.setAttribute("content", "#030712");
+            if (meta) meta.setAttribute("content", "#070a13");
           }
         } catch (_) {}
       })();

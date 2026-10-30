@@ -7,21 +7,27 @@
   --font-body: 'DM Sans', system-ui, sans-serif;
   --font-fa: 'Vazirmatn', 'DM Sans', system-ui, sans-serif;
 
-  /* OceanGram Oceanic Theme Mapping */
-  --color-emerald-50: #f0f9ff;
-  --color-emerald-100: #e0f2fe;
-  --color-emerald-200: #bae6fd;
-  --color-emerald-300: #7dd3fc;
-  --color-emerald-400: #38bdf8;
-  --color-emerald-500: #0ea5e9;
-  --color-emerald-600: #0284c7;
-  --color-emerald-700: #0369a1;
-  --color-emerald-800: #075985;
-  --color-emerald-900: #0c4a6e;
-  --color-emerald-950: #082f49;
+  /* Luxury Oceanic Obsidian System */
+  --color-emerald-50: #081524;
+  --color-emerald-100: #0d2138;
+  --color-emerald-200: #17385c;
+  --color-emerald-300: #38bdf8;
+  --color-emerald-400: #0ea5e9;
+  --color-emerald-500: #0284c7;
+  --color-emerald-600: #0369a1;
+  --color-emerald-700: #075985;
+  --color-emerald-800: #0c4a6e;
+  --color-emerald-900: #082f49;
+  --color-emerald-950: #041a29;
 
-  --shadow-glow: 0 20px 60px -30px rgba(14, 165, 233, 0.85);
-  --shadow-ocean: 0 10px 30px -10px rgba(2, 132, 199, 0.5);
+  --color-slate-950: #04070f;
+  --color-slate-900: #080d1a;
+  --color-slate-850: #0d1527;
+  --color-slate-800: #121c33;
+  --color-slate-700: #1e2d4d;
+
+  --shadow-glow: 0 20px 60px -30px rgba(14, 165, 233, 0.6);
+  --shadow-ocean: 0 10px 30px -10px rgba(2, 132, 199, 0.4);
 }
 
 /*

@@ -258,6 +258,8 @@ export function useAppContextMenu({
         kind,
         point,
         items,
+        messageId: message?.id || null,
+        targetMessage: message,
         targetEl: targetEl || null,
         targetChatId: activeChatId || null,
         targetMessageKey: message
