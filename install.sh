@@ -77,7 +77,7 @@ check_os() {
   fi
 }
 
-# Install essential dependencies (Docker, Docker Compose, Git, Curl, OpenSSL)
+# Install essential dependencies without geoblocked repos
 install_dependencies() {
   log_info "Updating system package index..."
   apt-get update -qq
@@ -87,27 +87,58 @@ install_dependencies() {
 
   # Check Docker
   if ! command -v docker &> /dev/null; then
-    log_info "Installing Docker Engine..."
-    install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
-    chmod a+r /etc/apt/keyrings/docker.gpg
-
-    UBUNTU_CODENAME="$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")"
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      ${UBUNTU_CODENAME} stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-    apt-get update -qq
-    apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    systemctl enable --now docker
-    log_success "Docker installed successfully."
+    log_info "Installing Docker Engine from official distribution packages (sanction-safe)..."
+    if apt-get install -y -qq docker.io docker-compose-v2 2>/dev/null; then
+      log_success "Docker installed via apt (docker.io + docker-compose-v2)."
+    elif apt-get install -y -qq docker.io docker-compose 2>/dev/null; then
+      log_success "Docker installed via apt (docker.io + docker-compose)."
+    elif apt-get install -y -qq docker.io 2>/dev/null; then
+      log_success "Docker installed via apt (docker.io)."
+    else
+      log_info "Trying get.docker.com fallback..."
+      curl -fsSL https://get.docker.com | sh || true
+    fi
+    systemctl enable --now docker 2>/dev/null || service docker start 2>/dev/null || true
   else
     log_success "Docker is already installed."
   fi
 
-  # Ensure docker compose is available
+  # Ensure docker compose / docker-compose command is available
   if ! docker compose version &> /dev/null; then
-    apt-get install -y -qq docker-compose-plugin
+    if command -v docker-compose &> /dev/null; then
+      mkdir -p /usr/local/lib/docker/cli-plugins 2>/dev/null || true
+      ln -sf "$(command -v docker-compose)" /usr/local/lib/docker/cli-plugins/docker-compose 2>/dev/null || true
+    else
+      log_info "Installing docker compose plugin..."
+      apt-get install -y -qq docker-compose-plugin 2>/dev/null || apt-get install -y -qq docker-compose 2>/dev/null || true
+    fi
+  fi
+
+  # Configure Docker Registry Mirrors to bypass Docker Hub 403 / geoblocks
+  mkdir -p /etc/docker
+  if [[ ! -f /etc/docker/daemon.json ]]; then
+    log_info "Configuring Docker registry mirrors (sanction-safe)..."
+    cat << 'EOF' > /etc/docker/daemon.json
+{
+  "registry-mirrors": [
+    "https://docker.arvancloud.ir",
+    "https://mirror.gcr.io",
+    "https://dockerproxy.com"
+  ]
+}
+EOF
+    systemctl restart docker 2>/dev/null || service docker restart 2>/dev/null || true
+  fi
+}
+
+# Resolve Compose Command (docker compose or docker-compose)
+get_compose_cmd() {
+  if docker compose version &> /dev/null; then
+    echo "docker compose"
+  elif command -v docker-compose &> /dev/null; then
+    echo "docker-compose"
+  else
+    echo "docker compose"
   fi
 }
 
@@ -185,32 +216,41 @@ fi
 
 cd "$DIR"
 
+# Detect compose
+if docker compose version &> /dev/null; then
+  DC="docker compose"
+elif command -v docker-compose &> /dev/null; then
+  DC="docker-compose"
+else
+  DC="docker compose"
+fi
+
 case "${1:-status}" in
   start)
     echo "Starting OceanGram..."
-    docker compose up -d
+    $DC up -d
     ;;
   stop)
     echo "Stopping OceanGram..."
-    docker compose down
+    $DC down
     ;;
   restart)
     echo "Restarting OceanGram..."
-    docker compose down
-    docker compose up -d
+    $DC down
+    $DC up -d
     ;;
   status)
-    docker compose ps
+    $DC ps
     ;;
   logs)
     shift
-    docker compose logs -f "$@"
+    $DC logs -f "$@"
     ;;
   update)
     echo "Updating OceanGram to the latest release..."
     git pull origin main
-    docker compose build --no-cache
-    docker compose up -d
+    $DC build --no-cache
+    $DC up -d
     echo "OceanGram successfully updated!"
     ;;
   *)
@@ -226,15 +266,18 @@ EOF
 # Build and start services via Docker Compose
 start_services() {
   cd "$INSTALL_DIR"
-  log_info "Building and launching OceanGram containers (this may take 1-2 minutes on first run)..."
-  docker compose build
-  docker compose up -d
+  local DC
+  DC="$(get_compose_cmd)"
+
+  log_info "Building and launching OceanGram containers with $DC..."
+  $DC build
+  $DC up -d
 
   log_info "Verifying healthcheck status..."
   local retries=15
   local running=false
   while [[ $retries -gt 0 ]]; do
-    if docker compose ps --filter "status=running" | grep -q "oceangram"; then
+    if $DC ps | grep -q "oceangram"; then
       running=true
       break
     fi
@@ -262,7 +305,7 @@ main() {
   start_services
 
   # Detect public IP
-  SERVER_IP="$(curl -s4 https://ifconfig.me || hostname -I | awk '{print $1}')"
+  SERVER_IP="$(curl -s4 --max-time 3 https://ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')"
 
   printf "\n%b=============================================================%b\n" "$C_GREEN" "$C_RESET"
   printf "%b  🎉 OceanGram Installation Complete!%b\n" "$C_BOLD" "$C_RESET"
