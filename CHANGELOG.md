@@ -1,3 +1,19 @@
+## 1.0.0 - OceanGram Official Release
+
+### ✨ Visual Redesign & Telegram-Grade Animations
+- 🌊 Complete brand transformation to **OceanGram** with fluid cyan/azure oceanic styling
+- 🎭 Telegram-style context menu overlays with frosted glass backdrop blur (`backdrop-blur-2xl`)
+- ⚡ Floating emoji reaction row (`👍`, `❤️`, `🔥`, `😂`, `👏`, `⚡`, `🌊`) with spring scale & bounce micro-interactions
+- 💬 Springy message entrance physics, pulsing online status rings, and animated oceanic wave shimmer
+- 🎨 Redesigned vector branding: high-res SVG logos, web manifest, and custom themes
+
+### 🚀 Production Deployment & Ubuntu Installer
+- ⚡ 1-Line automated interactive wizard for Ubuntu / Debian servers
+- 🔐 Automatic Let's Encrypt SSL generation & renewal hooks via Certbot (with SAN SSL fallback)
+- 🗄️ Multi-database engine architecture: SQLite3 (in-memory + WAL) and PostgreSQL (Docker or external)
+- 🛡️ Sanction-safe setup with automatic anti-sanction DNS injection and local package repositories
+- 🌐 Smart host port 80/443 conflict resolution and global CLI command (`oceangram`)
+
 ## 0.13.2
 
 ### New Features
