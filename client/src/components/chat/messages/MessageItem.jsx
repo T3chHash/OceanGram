@@ -1532,7 +1532,7 @@ export const MessageItem = memo(function MessageItem({
                         e.stopPropagation();
                         toggleMessageReaction(msg.id, emoji);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-slate-900/80 px-2.5 py-0.5 text-xs font-semibold text-sky-200 backdrop-blur-md transition-all duration-150 hover:scale-110 active:scale-90 shadow-sm cursor-pointer"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-sky-300/40 bg-white/90 dark:border-sky-400/30 dark:bg-slate-900/85 px-2.5 py-0.5 text-xs font-semibold text-sky-800 dark:text-sky-200 backdrop-blur-md transition-all duration-150 hover:scale-110 active:scale-95 shadow-xs hover:shadow-md cursor-pointer"
                       title="Toggle reaction"
                     >
                       <span className="text-sm leading-none">{emoji}</span>

@@ -1,3 +1,19 @@
+## 1.2.0 - Official 3D Transparent Logo & Full Branding Clean
+
+### 🌊 Official 3D Transparent Ocean Logo
+- 🎨 Added custom 3D glass bubble wave emblem with pure transparent alpha background
+- 📱 Generated high-resolution PWA & web icons (16px, 32px, 180px, 192px, 512px, maskable) and embedded transparent vector SVG
+- ⚡ Removed all flat placeholders and unbranded watermarks
+
+### ☀️ Light Mode Bug Fix & High-Contrast Polish
+- 🛠️ Fixed corrupted Tailwind color tokens where light surfaces were overridden by dark hexes
+- 🌈 Crisp, readable message bubbles and reactive emoji badge pills across both light and dark themes
+- 🌓 Smooth theme switching and background color persistence
+
+### 🏷️ Global Rebranding & Cleanup
+- 🧼 Replaced all remaining legacy labels, placeholders, and notification badges with **OceanGram**
+- 🛡️ Preserved backend protocol compatibility while presenting a unified, mature frontend
+
 ## 1.1.0 - Telegram-Style Message Reaction Badges & Obsidian Theme
 
 ### ✨ Real Telegram-Style Message Reaction Badges

@@ -166,7 +166,7 @@ export function AboutSettingsPanel({
             </a>
           </p>
           <p className="mt-1 text-center text-[11px] text-slate-500 dark:text-slate-400">
-            All rights reserved. Songbird is a free and open-source project,
+            All rights reserved. OceanGram is a free and open-source project,
             licensed under the MIT License.
           </p>
           <p className="mt-1 text-center text-[11px] text-slate-500 dark:text-slate-400">

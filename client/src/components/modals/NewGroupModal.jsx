@@ -174,7 +174,7 @@ export default function NewGroupModal({
     fileUploadEnabled &&
     Boolean(groupForm.remoteChannelStreamMedia);
   const remoteProviderLabel =
-    groupForm.remoteChannelProvider === "songbird" ? "Songbird" : "Telegram";
+    groupForm.remoteChannelProvider === "songbird" ? "OceanGram" : "Telegram";
   const remoteSourcePlaceholder =
     groupForm.remoteChannelProvider === "songbird"
       ? "https://example.com/invite/channelname"
@@ -608,7 +608,7 @@ export default function NewGroupModal({
                           >
                             <span className="flex items-center gap-2">
                               <SongbirdIcon size={16} />
-                              Songbird
+                              OceanGram
                             </span>
                             {groupForm.remoteChannelProvider === "songbird" ? (
                               <span className="h-2 w-2 rounded-full bg-emerald-500" />

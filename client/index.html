@@ -12,8 +12,10 @@
     <style>
       html,
       body {
-        background: #070a13;
+        background: #f8fafc;
       }
+      html.dark,
+      html.dark body,
       html.sb-preload-dark,
       html.sb-preload-dark body {
         background: #070a13;
@@ -23,7 +25,7 @@
       (function () {
         try {
           var stored = localStorage.getItem("oceangram-theme") || localStorage.getItem("songbird-theme");
-          var isDark = stored !== "light";
+          var isDark = stored ? stored === "dark" : true;
           if (isDark) {
             var root = document.documentElement;
             root.classList.add("dark", "sb-preload-dark");
@@ -31,6 +33,13 @@
             root.style.backgroundColor = "#070a13";
             var meta = document.querySelector('meta[name="theme-color"]');
             if (meta) meta.setAttribute("content", "#070a13");
+          } else {
+            var root = document.documentElement;
+            root.classList.remove("dark", "sb-preload-dark");
+            root.style.colorScheme = "light";
+            root.style.backgroundColor = "#f8fafc";
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute("content", "#f8fafc");
           }
         } catch (_) {}
       })();

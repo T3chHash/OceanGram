@@ -386,7 +386,7 @@ export function useChatNotifications({
         const reg =
           pushRegistrationRef.current || (await navigator.serviceWorker.ready);
         if (reg?.showNotification) {
-          await reg.showNotification("Songbird", {
+          await reg.showNotification("OceanGram", {
             body: "Test notification",
             badge: "/icons/icon-192.png",
             icon: "/icons/icon-192.png",
