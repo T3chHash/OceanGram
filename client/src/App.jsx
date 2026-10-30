@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import logo from './assets/oceangram-logo.svg'
+import logoPng from './assets/oceangram-logo.png'
 import { APP_CONFIG, setMessageMaxChars } from './settings/appConfig.js'
 import { fetchAppInfo } from './api/appMetaApi.js'
 import { setNameLimits } from './utils/nameLimits.js'
@@ -61,8 +62,8 @@ function RouteLoadingFallback({ themeColor, onVisibleChange = null }) {
     >
       <div className="flex flex-col items-center gap-3 text-center text-cyan-600 dark:text-cyan-400">
         <div className="relative">
-          <div className="absolute -inset-2 rounded-full bg-cyan-400/20 blur-md animate-pulse"></div>
-          <img src={logo} alt="OceanGram logo" className="relative h-12 w-12 animate-pulse drop-shadow-md" />
+          <div className="absolute -inset-3 rounded-full bg-sky-400/30 blur-lg animate-pulse"></div>
+          <img src={logoPng} alt="OceanGram logo" className="relative h-16 w-16 animate-pulse drop-shadow-xl" />
         </div>
         <p className="text-xs font-semibold tracking-wide">{`Connecting to OceanGram${'.'.repeat(dots)}`}</p>
       </div>
@@ -998,9 +999,9 @@ export default function App() {
           {isAuthRoute ? (
             <header className="flex flex-wrap items-center justify-center gap-3 text-center sm:gap-4">
               <div className="flex items-center gap-2.5 text-slate-900 dark:text-white">
-                <div className="relative flex h-9 w-9 items-center justify-center sm:h-10 sm:w-10">
-                  <div className="absolute -inset-1 rounded-full bg-cyan-500/25 blur-sm animate-pulse"></div>
-                  <img src={logo} alt="OceanGram logo" className="relative h-9 w-9 drop-shadow" />
+                <div className="relative flex h-10 w-10 items-center justify-center sm:h-12 sm:w-12">
+                  <div className="absolute -inset-1.5 rounded-full bg-cyan-500/25 blur-md animate-pulse"></div>
+                  <img src={logoPng} alt="OceanGram logo" className="relative h-10 w-10 sm:h-12 sm:w-12 object-contain drop-shadow" />
                 </div>
                 <div>
                   <p className="text-xl font-extrabold tracking-tight sm:text-2xl bg-gradient-to-r from-sky-600 via-cyan-500 to-teal-400 bg-clip-text text-transparent">OceanGram</p>

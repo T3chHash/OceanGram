@@ -365,8 +365,21 @@ export const CallScreen = memo(function CallScreen({
     audio.loop = true;
     ringtoneRef.current = audio;
     void audio.play().catch(() => {});
+    let vibrateInterval = null;
+    if (callState === "ringing" && typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate([500, 250, 500, 250, 500]);
+        vibrateInterval = setInterval(() => {
+          navigator.vibrate([500, 250, 500, 250, 500]);
+        }, 2500);
+      } catch (_) {}
+    }
     return () => {
       audio.pause();
+      if (vibrateInterval) clearInterval(vibrateInterval);
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        try { navigator.vibrate(0); } catch (_) {}
+      }
       if (ringtoneRef.current === audio) ringtoneRef.current = null;
     };
   }, [callState, isEnding]);

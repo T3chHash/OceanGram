@@ -1,4 +1,5 @@
 import { Moon, Sun } from "../../icons/lucide.js";
+import logo from "../../assets/oceangram-logo.png";
 
 export default function AuthHeader({
   isLogin,
@@ -10,6 +11,13 @@ export default function AuthHeader({
 }) {
   return (
     <div className="relative text-center">
+      <div className="mx-auto mb-3 flex h-20 w-20 items-center justify-center">
+        <img
+          src={logo}
+          alt="OceanGram"
+          className="h-20 w-20 object-contain drop-shadow-[0_10px_25px_rgba(14,165,233,0.35)] transition-transform duration-300 hover:scale-105"
+        />
+      </div>
       <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-600 dark:text-emerald-300 sm:text-sm">
         {subtitle || (isLogin ? "Sign in" : "Create account")}
       </p>

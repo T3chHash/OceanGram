@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, Copy, Heart } from "../../../icons/lucide.js";
+import oceanLogo from "../../../assets/oceangram-logo.png";
 import {
   DockerIcon,
   GithubIcon,
@@ -99,6 +100,19 @@ export function AboutSettingsPanel({
 
   return (
     <div className="space-y-4 text-slate-600 dark:text-slate-300">
+      <div className="flex flex-col items-center justify-center py-2 text-center">
+        <div className="relative mb-2 flex h-20 w-20 items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-sky-500/20 blur-xl animate-pulse" />
+          <img
+            src={oceanLogo}
+            alt="OceanGram"
+            className="relative h-20 w-20 object-contain drop-shadow-[0_10px_25px_rgba(14,165,233,0.35)]"
+          />
+        </div>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">OceanGram</h3>
+        <p className="text-xs text-sky-600 dark:text-sky-400 font-semibold">Modern Secure Real-Time Messenger</p>
+      </div>
+
       <div
         className={
           isMobile

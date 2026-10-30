@@ -15,6 +15,7 @@ import {
 } from "../../../icons/lucide.js";
 import { hasPersian } from "../../../utils/fontUtils.js";
 import { renderMarkdownInlinePlain } from "../../../utils/markdown.js";
+import { useI18n } from "../../../utils/i18n.js";
 import {
   getCallLogLabel,
   parseCallLogBody,
@@ -87,6 +88,7 @@ export function MessageComposer({
   onRequestMicrophonePermission,
   currentUsername = "",
 }) {
+  const { t } = useI18n();
   const composerRef = useRef(null);
   const fallbackInputRef = useRef(null);
   const messageInputRef = composerInputRef || fallbackInputRef;
@@ -1096,7 +1098,7 @@ export function MessageComposer({
               ref={messageInputRef}
               name="message"
               rows={1}
-              placeholder="Type a message"
+              placeholder={t("type_message", "Write a message...")}
               aria-label={
                 editTarget
                   ? "Edit message"

@@ -143,24 +143,25 @@ self.addEventListener("push", (event) => {
           // A focused Songbird window rings in-app via realtime.
           return;
         }
-        await self.registration.showNotification(payload.title || "Songbird", {
-          body: payload.body || "",
+        await self.registration.showNotification(payload.title || "OceanGram Call", {
+          body: payload.body || "Incoming call...",
           data,
           tag: callTag,
           renotify: true,
           requireInteraction: true,
           badge: "/icons/icon-192.png",
           icon: "/icons/icon-192.png",
+          vibrate: [500, 250, 500, 250, 500, 250, 500],
         });
       })(),
     );
     return;
   }
 
-  const title = payload.title || "Songbird";
+  const title = payload.title || "OceanGram";
   const body = payload.body || "New message";
   const badgeCount = Number(payload.badge || 0);
-  const tag = data.chatId ? `chat-${data.chatId}` : "songbird";
+  const tag = data.chatId ? `chat-${data.chatId}` : "oceangram";
   const options = {
     body,
     data,
@@ -168,6 +169,8 @@ self.addEventListener("push", (event) => {
     renotify: true,
     badge: "/icons/icon-192.png",
     icon: "/icons/icon-192.png",
+    vibrate: [200, 100, 200, 100, 250],
+    silent: false,
   };
   event.waitUntil(
     (async () => {

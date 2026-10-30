@@ -40,6 +40,8 @@ import {
   readIdbCache,
 } from "../../utils/chatCache.js";
 import { isCallSupported } from "../../utils/callCapabilities.js";
+import oceanLogo from "../../assets/oceangram-logo.png";
+import { useI18n } from "../../utils/i18n.js";
 
 export default function ChatWindowPanel({
   mobileTab,
@@ -131,6 +133,7 @@ export default function ChatWindowPanel({
   isDmChat = false,
   showFloatingLabel = false,
 }) {
+  const { t } = useI18n();
   const MEDIA_CACHE_VERSION = 1;
   const MEDIA_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
   const VIDEO_POSTER_CACHE_KEY = MEDIA_POSTER_CACHE_KEY;
@@ -1509,11 +1512,24 @@ export default function ChatWindowPanel({
         {!activeChatId ? (
           <div
             ref={chatScrollRef}
-            className="chat-scroll flex h-full items-center justify-center overflow-y-auto overflow-x-hidden px-6 py-6"
+            className="chat-scroll flex h-full flex-col items-center justify-center overflow-y-auto overflow-x-hidden px-6 py-6 select-none"
             style={chatScrollStyle}
           >
-            <div className="rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-sm font-semibold text-emerald-700 dark:border-emerald-500/30 dark:bg-slate-950 dark:text-emerald-200">
-              Select a chat to start
+            <div className="flex flex-col items-center max-w-sm text-center">
+              <div className="relative mb-6 flex h-28 w-28 items-center justify-center">
+                <div className="absolute inset-0 rounded-full bg-sky-500/20 blur-2xl animate-pulse" />
+                <img
+                  src={oceanLogo}
+                  alt="OceanGram"
+                  className="relative h-28 w-28 object-contain drop-shadow-[0_12px_30px_rgba(14,165,233,0.4)] transition-transform duration-300 hover:scale-105"
+                />
+              </div>
+              <h2 className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
+                OceanGram
+              </h2>
+              <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                {t("select_chat", "Select a chat to start messaging")}
+              </p>
             </div>
           </div>
         ) : (

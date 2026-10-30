@@ -1,3 +1,29 @@
+## 1.3.0 - Telegram-Grade Sound & Vibration Alerts, Full Multi-Language System & 3D Logo Overhaul
+
+### 🔔 SMS & Telegram-Style Notification Alerts
+- 🎵 Dual-tone synthesised Telegram/SMS message incoming chime (`659.25Hz -> 880Hz / 1318Hz`) via Web Audio API
+- 📳 Mobile haptic vibration patterns: `[200, 100, 200, 100, 250]` on incoming messages, continuous `[500, 250, 500]` on incoming calls
+- 📲 Background & lockscreen notification dispatcher when app/tab is hidden or minimized
+- 📞 Full ringing loop and device vibration in call screens
+
+### 🌐 Global Multi-Language System (Telegram-Style i18n)
+- 🌍 Complete internationalization engine supporting 9 global languages:
+  - 🇺🇸 English (`en`)
+  - 🇮🇷 فارسی / Persian (`fa`)
+  - 🇸🇦 العربية / Arabic (`ar`)
+  - 🇷🇺 Русский / Russian (`ru`)
+  - 🇪🇸 Español / Spanish (`es`)
+  - 🇩🇪 Deutsch / German (`de`)
+  - 🇫🇷 Français / French (`fr`)
+  - 🇹🇷 Türkçe / Turkish (`tr`)
+  - 🇨🇳 简体中文 / Chinese (`zh`)
+- ⚙️ Interactive Language settings panel with instant switching and automatic RTL/LTR document layout adaptation
+- 💾 Persistent language preferences saved across reloads
+
+### 🌊 3D Emblem & OpenGraph Overhaul
+- 🖼️ Prominently integrated official transparent 3D ocean bubble wave emblem across desktop empty states, auth screens, splash loader, and About modal
+- 🌐 Added OpenGraph (`og:image`, `og:title`, `og:description`) and Twitter cards for instant social preview card rendering
+
 ## 1.2.0 - Official 3D Transparent Logo & Full Branding Clean
 
 ### 🌊 Official 3D Transparent Ocean Logo

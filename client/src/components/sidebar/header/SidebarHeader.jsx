@@ -15,6 +15,7 @@ import {
   Users,
 } from "../../../icons/lucide.js";
 import { hasPersian } from "../../../utils/fontUtils.js";
+import { useI18n } from "../../../utils/i18n.js";
 import UserMenuButton from "./UserMenuButton.jsx";
 
 export default function SidebarHeader({
@@ -62,6 +63,7 @@ export default function SidebarHeader({
   handleLogout,
   onOpenOwnProfile,
 }) {
+  const { t } = useI18n();
   const isCallsMode = mobileTab === "calls";
   const isChatsTab = mobileTab !== "calls" && mobileTab !== "settings";
   const [showCreateMenu, setShowCreateMenu] = useState(false);
@@ -182,13 +184,13 @@ export default function SidebarHeader({
                   <LoaderCircle className="h-5 w-5 animate-spin text-emerald-500" />
                 ) : null}
                 {editMode ? (
-                  "Edit"
+                  t("edit", "Edit")
                 ) : chatsSearchFocused ? (
-                  "Search"
+                  t("search", "Search")
                 ) : !isConnected ? (
-                  "Connecting..."
+                  t("connecting", "Connecting...")
                 ) : isUpdating ? (
-                  "Updating..."
+                  t("updating", "Updating...")
                 ) :                 chatsScrollable ? (
                   <button
                     type="button"
@@ -196,10 +198,10 @@ export default function SidebarHeader({
                     className="inline-flex cursor-pointer items-center gap-2 px-1 py-0.5 text-inherit"
                     aria-label={`${title} to top`}
                   >
-                    {title}
+                    {isCallsMode ? t("calls", "Calls") : t("chats", title || "Chats")}
                   </button>
                 ) : (
-                  title
+                  isCallsMode ? t("calls", "Calls") : t("chats", title || "Chats")
                 )}
               </span>
             </h2>
@@ -307,7 +309,7 @@ export default function SidebarHeader({
                       className="icon-anim-pop block text-emerald-600 dark:text-emerald-300"
                     />
                   </span>
-                  <span>Search</span>
+                  <span>{t("search", "Search")}</span>
                 </span>
               ) : null}
               {chatsSearchFocused || hasSearchText ? (
@@ -326,7 +328,7 @@ export default function SidebarHeader({
                 onChange={(event) => onChatsSearchChange?.(event.target.value)}
                 onFocus={onChatsSearchFocus}
                 onBlur={onChatsSearchBlur}
-                placeholder="Search"
+                placeholder={t("search", "Search")}
                 lang={searchIsRtl ? "fa" : "en"}
                 dir={searchIsRtl ? "rtl" : "ltr"}
                 className={`w-full rounded-2xl border border-emerald-200 bg-white py-2 pr-10 text-sm text-slate-700 outline-hidden transition hover:border-emerald-300 hover:shadow-[0_0_16px_rgba(16,185,129,0.18)] focus:border-emerald-400 focus:bg-white/80 focus:ring-2 focus:ring-emerald-300/60 dark:border-emerald-500/30 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-emerald-500/50 dark:hover:shadow-[0_0_18px_rgba(16,185,129,0.12)] dark:focus:bg-slate-950 ${

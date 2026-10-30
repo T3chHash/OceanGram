@@ -1,4 +1,5 @@
 import { Chat, Phone, Settings } from "../../icons/lucide.js";
+import { useI18n } from "../../utils/i18n.js";
 
 export default function MobileTabMenu({
   hidden,
@@ -7,6 +8,7 @@ export default function MobileTabMenu({
   onCalls,
   onSettings,
 }) {
+  const { t } = useI18n();
   return (
     <div
       className={`fixed inset-x-0 bottom-0 z-10 px-4 sm:px-6 md:hidden ${
@@ -33,7 +35,7 @@ export default function MobileTabMenu({
           <span className="relative z-10">
             <Phone className="icon-anim-bob" />
           </span>
-          <span className="relative z-10">Calls</span>
+          <span className="relative z-10">{t("calls", "Calls")}</span>
         </button>
         <button
           type="button"
@@ -50,7 +52,7 @@ export default function MobileTabMenu({
           <span className="relative z-10">
             <Chat className="icon-anim-bob" />
           </span>
-          <span className="relative z-10">Chats</span>
+          <span className="relative z-10">{t("chats", "Chats")}</span>
         </button>
         <button
           type="button"
@@ -67,7 +69,7 @@ export default function MobileTabMenu({
           <span className="relative z-10">
             <Settings className="icon-anim-spin-dir" />
           </span>
-          <span className="relative z-10">Settings</span>
+          <span className="relative z-10">{t("settings", "Settings")}</span>
         </button>
       </div>
     </div>

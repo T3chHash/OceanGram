@@ -5,6 +5,7 @@ import {
   isRemoteChannelMessage,
 } from "../../utils/messageOwnership.js";
 import { normalizeUuid } from "../../utils/uuidUtils.js";
+import { notifyIncomingMessage } from "../../utils/soundEffects.js";
 
 const patchChatAndMoveToFront = (chats, chatId, updateChat) => {
   const targetChatId = normalizeUuid(chatId) || null;
@@ -355,6 +356,22 @@ export function useChatEvents({
           }
         }
         if (isIncomingMessage) {
+          notifyIncomingMessage();
+          if (typeof document !== "undefined" && (document.hidden || !document.hasFocus())) {
+            try {
+              if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+                const title = payload?.username ? `${payload.username}` : "OceanGram";
+                const body = String(payload?.summaryText || payload?.body || "New message").slice(0, 120);
+                new Notification(title, {
+                  body,
+                  icon: "/icons/icon-192.png",
+                  badge: "/icons/icon-192.png",
+                  vibrate: [200, 100, 200, 100, 250],
+                  tag: `oceangram-${payloadChatId || "msg"}`,
+                });
+              }
+            } catch (_) {}
+          }
           onIncomingMessageRef.current?.(payload, {
             isActiveChat: isReadableActiveChat,
             isSelectedChat,

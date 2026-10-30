@@ -8,6 +8,7 @@ import {
   Eye,
   EyeOff,
   Info,
+  Globe,
   LogOut,
   Moon,
   Pencil,
@@ -26,6 +27,8 @@ import { InlineError } from "../common/InlineError.jsx";
 import { AboutSettingsPanel } from "./AboutSettingsPanel.jsx";
 import { DataSettingsPanel } from "./DataSettingsPanel.jsx";
 import { NotificationsSettingsPanel } from "./NotificationsSettingsPanel.jsx";
+import LanguageSettingsModal from "../modals/LanguageSettingsModal.jsx";
+import { useI18n } from "../../../utils/i18n.js";
 import ConfirmPasswordModal from "../../modals/ConfirmPasswordModal.jsx";
 import Avatar from "../../common/Avatar.jsx";
 import VerifiedBadge from "../../common/VerifiedBadge.jsx";
@@ -158,6 +161,9 @@ export function MobileSettingsPanel({
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [languageModalOpen, setLanguageModalOpen] = useState(false);
+  const { lang, languages, t } = useI18n();
+  const currentLangObj = languages.find((l) => l.code === lang) || languages[0];
   const profilePhotoInputRef = useRef(null);
   const touchStartXRef = useRef(0);
   const touchStartYRef = useRef(0);
@@ -675,12 +681,18 @@ export function MobileSettingsPanel({
                   onClick={() => setSettingsPanel("data")}
                 />
                 <MobileMenuRow
-                  label="Notifications"
-                  icon={<Bell size={22} className="icon-anim-swing" />}
+                  label={t("notifications", "Notifications")}
+                  icon={<Bell size={22} className="icon-anim-swing text-sky-500" />}
                   onClick={openNotificationsPanel}
                 />
                 <MobileMenuRow
-                  label={isDark ? "Light mode" : "Dark mode"}
+                  label={t("language", "Language")}
+                  icon={<Globe size={22} className="icon-anim-spin-dir text-cyan-500" />}
+                  onClick={() => setLanguageModalOpen(true)}
+                  trailing={<span className="text-xs font-semibold text-sky-600 dark:text-sky-400">{currentLangObj?.nativeName}</span>}
+                />
+                <MobileMenuRow
+                  label={isDark ? t("light_mode", "Light mode") : t("dark_mode", "Dark mode")}
                   icon={
                     isDark ? (
                       <Sun size={22} className="icon-anim-spin-dir" />
@@ -763,6 +775,11 @@ export function MobileSettingsPanel({
         onConfirm={async (password) => {
           await onDeleteAccount?.(password);
         }}
+      />
+
+      <LanguageSettingsModal
+        open={languageModalOpen}
+        onClose={() => setLanguageModalOpen(false)}
       />
     </>
   );
