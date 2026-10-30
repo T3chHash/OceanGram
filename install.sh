@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # OceanGram — Modern Secure Real-time Messenger
-# One-Line Ubuntu / Debian Production Installer
+# One-Line Ubuntu / Debian Production Installer (Sanction-Bypass Edition)
 # Repository: https://github.com/T3chHash/OceanGram.git
 # ==============================================================================
 
@@ -77,17 +77,43 @@ check_os() {
   fi
 }
 
+# Clean any broken/leftover docker.com repos from previous failed attempts
+clean_legacy_docker_repos() {
+  log_info "Cleaning up any broken/geoblocked apt repository lists..."
+  rm -f /etc/apt/sources.list.d/docker*.list
+  rm -f /etc/apt/keyrings/docker*.gpg
+}
+
+# Setup anti-sanction DNS (Shecan & 403.online) if external downloads are blocked
+setup_dns_fallback() {
+  log_info "Ensuring anti-sanction DNS resolvers are available..."
+  if ! grep -q "178.22.122.100" /etc/resolv.conf 2>/dev/null; then
+    cp /etc/resolv.conf /etc/resolv.conf.bak 2>/dev/null || true
+    # Add Shecan & 403.online at top of resolv.conf
+    {
+      echo "nameserver 178.22.122.100"
+      echo "nameserver 185.51.200.2"
+      echo "nameserver 10.202.10.202"
+      cat /etc/resolv.conf.bak 2>/dev/null || true
+    } | awk '!seen[$0]++' > /etc/resolv.conf 2>/dev/null || true
+    log_success "Anti-sanction DNS active (Shecan & 403.online)."
+  fi
+}
+
 # Install essential dependencies without geoblocked repos
 install_dependencies() {
+  clean_legacy_docker_repos
+  setup_dns_fallback
+
   log_info "Updating system package index..."
-  apt-get update -qq
+  apt-get update -qq || true
 
   log_info "Installing required packages (curl, git, openssl, ca-certificates)..."
   apt-get install -y -qq curl git openssl ca-certificates gnupg lsb-release
 
   # Check Docker
   if ! command -v docker &> /dev/null; then
-    log_info "Installing Docker Engine from official distribution packages (sanction-safe)..."
+    log_info "Installing Docker Engine from Ubuntu official repository (sanction-safe)..."
     if apt-get install -y -qq docker.io docker-compose-v2 2>/dev/null; then
       log_success "Docker installed via apt (docker.io + docker-compose-v2)."
     elif apt-get install -y -qq docker.io docker-compose 2>/dev/null; then
@@ -96,7 +122,7 @@ install_dependencies() {
       log_success "Docker installed via apt (docker.io)."
     else
       log_info "Trying get.docker.com fallback..."
-      curl -fsSL https://get.docker.com | sh || true
+      curl -fsSL https://get.docker.com | sh 2>/dev/null || true
     fi
     systemctl enable --now docker 2>/dev/null || service docker start 2>/dev/null || true
   else
@@ -116,9 +142,8 @@ install_dependencies() {
 
   # Configure Docker Registry Mirrors to bypass Docker Hub 403 / geoblocks
   mkdir -p /etc/docker
-  if [[ ! -f /etc/docker/daemon.json ]]; then
-    log_info "Configuring Docker registry mirrors (sanction-safe)..."
-    cat << 'EOF' > /etc/docker/daemon.json
+  log_info "Configuring Docker registry mirrors (sanction-safe)..."
+  cat << 'EOF' > /etc/docker/daemon.json
 {
   "registry-mirrors": [
     "https://docker.arvancloud.ir",
@@ -127,8 +152,7 @@ install_dependencies() {
   ]
 }
 EOF
-    systemctl restart docker 2>/dev/null || service docker restart 2>/dev/null || true
-  fi
+  systemctl restart docker 2>/dev/null || service docker restart 2>/dev/null || true
 }
 
 # Resolve Compose Command (docker compose or docker-compose)
