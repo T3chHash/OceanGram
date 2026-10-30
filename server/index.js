@@ -233,7 +233,7 @@ const appEnv = process.env.APP_ENV || "production";
 const isProduction = appEnv === "production";
 // For Docker/container deployments, set BIND_ADDRESS=0.0.0.0
 // For VPS with firewall, can use localhost (nginx proxies from same machine)
-const bindAddress = process.env.BIND_ADDRESS || "localhost";
+const bindAddress = process.env.BIND_ADDRESS || "0.0.0.0";
 
 function debugLog(...args) {
   if (!getSetting("APP_DEBUG")) return;

@@ -48,8 +48,7 @@ services:
       - ./certs/cert.pem:/etc/nginx/certs/cert.pem:ro
       - ./certs/key.pem:/etc/nginx/certs/key.pem:ro
     depends_on:
-      oceangram:
-        condition: service_healthy
+      - oceangram
 
 volumes:
   oceangram-data:

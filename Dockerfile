@@ -75,8 +75,8 @@ ENV BIND_ADDRESS=0.0.0.0
 EXPOSE 5174
 
 # Health check for container orchestrators
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "const port = process.env.PORT || process.env.SERVER_PORT || 5174; require('http').get('http://localhost:' + port + '/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=5 \
+  CMD node -e "const port = process.env.PORT || process.env.SERVER_PORT || 5174; const req = require('http').get('http://127.0.0.1:' + port + '/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)); req.on('error', () => process.exit(1));"
 
 ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
 CMD ["node", "server/index.js"]

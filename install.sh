@@ -215,6 +215,7 @@ setup_env() {
     {
       echo "APP_ENV=production"
       echo "SERVER_PORT=5174"
+      echo "BIND_ADDRESS=0.0.0.0"
       echo "CLIENT_PORT=443"
       echo "JWT_SECRET=${jwt_secret}"
       echo "SESSION_SECRET=${session_secret}"
