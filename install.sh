@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # OceanGram — Modern Secure Real-time Messenger
-# One-Line Ubuntu / Debian Production Installer (Sanction-Bypass Edition)
+# One-Line Ubuntu / Debian Production Installer (Port Conflict & Sanction-Safe)
 # Repository: https://github.com/T3chHash/OceanGram.git
 # ==============================================================================
 
@@ -100,6 +100,27 @@ setup_dns_fallback() {
   fi
 }
 
+# Ensure ports 80 and 443 are free from host processes (apache2, host nginx)
+free_host_web_ports() {
+  log_info "Checking port 80 and 443 availability..."
+  if systemctl is-active --quiet apache2 2>/dev/null; then
+    log_info "Stopping and disabling host apache2 service (was holding port 80)..."
+    systemctl stop apache2 2>/dev/null || true
+    systemctl disable apache2 2>/dev/null || true
+  fi
+
+  if systemctl is-active --quiet nginx 2>/dev/null; then
+    log_info "Stopping host nginx service (to allow Docker nginx container on port 80/443)..."
+    systemctl stop nginx 2>/dev/null || true
+    systemctl disable nginx 2>/dev/null || true
+  fi
+
+  if command -v fuser &>/dev/null; then
+    fuser -k 80/tcp 2>/dev/null || true
+    fuser -k 443/tcp 2>/dev/null || true
+  fi
+}
+
 # Install essential dependencies without geoblocked repos
 install_dependencies() {
   clean_legacy_docker_repos
@@ -108,8 +129,11 @@ install_dependencies() {
   log_info "Updating system package index..."
   apt-get update -qq || true
 
-  log_info "Installing required packages (curl, git, openssl, ca-certificates)..."
-  apt-get install -y -qq curl git openssl ca-certificates gnupg lsb-release
+  log_info "Installing required packages (curl, git, openssl, ca-certificates, psmisc)..."
+  apt-get install -y -qq curl git openssl ca-certificates gnupg lsb-release psmisc
+
+  # Free ports 80 and 443 from any background host services
+  free_host_web_ports
 
   # Check Docker
   if ! command -v docker &> /dev/null; then
@@ -294,11 +318,17 @@ start_services() {
   local DC
   DC="$(get_compose_cmd)"
 
+  # Ensure host apache/nginx aren't hogging ports 80/443
+  free_host_web_ports
+
+  # Clean down any stale containers before starting
+  $DC down 2>/dev/null || true
+
   log_info "Building and launching OceanGram containers with $DC..."
   $DC build
   $DC up -d
 
-  log_info "Verifying healthcheck status..."
+  log_info "Verifying container status..."
   local retries=15
   local running=false
   while [[ $retries -gt 0 ]]; do
