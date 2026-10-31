@@ -4,6 +4,7 @@ import {
   Pencil,
   File,
   ImageIcon,
+  MapPin,
   Mic,
   Paperclip,
   Phone,
@@ -11,8 +12,10 @@ import {
   Reply,
   Send,
   Close,
+  Smile,
   Video,
 } from "../../../icons/lucide.js";
+import EmojiStickerPicker from "../EmojiStickerPicker.jsx";
 import { hasPersian } from "../../../utils/fontUtils.js";
 import { renderMarkdownInlinePlain } from "../../../utils/markdown.js";
 import { useI18n } from "../../../utils/i18n.js";
@@ -96,7 +99,44 @@ export function MessageComposer({
   const previousEditIdRef = useRef(0);
   const appliedEditIdRef = useRef(0);
   const [messageValue, setMessageValue] = useState("");
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+
+  const handleShareLocation = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+    setIsLocating(true);
+    setShowUploadMenu(false);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setIsLocating(false);
+        const { latitude, longitude } = position.coords;
+        const locationText = `📍 Location: https://www.openstreetmap.org/?mlat=${latitude.toFixed(6)}&mlon=${longitude.toFixed(6)}#map=16/${latitude.toFixed(6)}/${longitude.toFixed(6)}`;
+        setMessageValue(locationText);
+        onMessageInput?.(locationText);
+        setTimeout(() => messageInputRef.current?.focus(), 50);
+      },
+      (err) => {
+        setIsLocating(false);
+        alert(`Could not fetch location: ${err.message}`);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const handleSendSticker = (stickerEmoji) => {
+    setMessageValue(stickerEmoji);
+    onMessageInput?.(stickerEmoji);
+    setTimeout(() => {
+      const form = composerRef.current?.closest("form") || messageInputRef.current?.form;
+      if (form) {
+        form.requestSubmit();
+      }
+    }, 50);
+  };
   const [recordingMs, setRecordingMs] = useState(0);
   const recordingTimerRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -1058,6 +1098,15 @@ export function MessageComposer({
                     <File size={18} className="shrink-0 text-emerald-500 icon-anim-lift" />
                     Document
                   </button>
+                  <button
+                    type="button"
+                    disabled={isLocating}
+                    onClick={handleShareLocation}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-200"
+                  >
+                    <MapPin size={18} className="shrink-0 text-sky-500 icon-anim-sway" />
+                    {isLocating ? "Getting location..." : "Location"}
+                  </button>
                 </div>
               ) : null}
               <input
@@ -1156,6 +1205,15 @@ export function MessageComposer({
                 textAlign: "start",
               }}
             />
+            <button
+              type="button"
+              onClick={() => setEmojiPickerOpen((prev) => !prev)}
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-transparent text-slate-400 hover:text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950/40 dark:text-slate-400 dark:hover:text-sky-300 transition cursor-pointer"
+              aria-label="Emoji & Stickers"
+              title="Emoji & Stickers"
+            >
+              <Smile size={20} className="icon-anim-sway" />
+            </button>
           </>
         ) : (
           <div className="flex min-w-0 flex-1 items-center justify-between rounded-2xl border border-emerald-200 bg-white px-4 py-2 text-sm text-emerald-700 dark:border-emerald-500/30 dark:bg-slate-900 dark:text-emerald-200">
@@ -1214,6 +1272,17 @@ export function MessageComposer({
           )}
         </button>
       </div>
+      <EmojiStickerPicker
+        open={emojiPickerOpen}
+        onClose={() => setEmojiPickerOpen(false)}
+        onSelectEmoji={(emoji) => {
+          const nextVal = messageValue + emoji;
+          setMessageValue(nextVal);
+          onMessageInput?.(nextVal);
+          setTimeout(() => messageInputRef.current?.focus(), 50);
+        }}
+        onSendSticker={handleSendSticker}
+      />
     </form>
   );
 }

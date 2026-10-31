@@ -8,10 +8,12 @@ import {
 import {
   ArrowDown,
   ArrowLeft,
+  Close,
   Copy,
   Ghost,
   LoaderCircle,
   Phone,
+  Pin,
   Video,
 } from "../../icons/lucide.js";
 import { getAvatarStyle } from "../../utils/avatarColor.js";
@@ -134,6 +136,53 @@ export default function ChatWindowPanel({
   showFloatingLabel = false,
 }) {
   const { t } = useI18n();
+  const [pinnedMessage, setPinnedMessage] = useState(null);
+
+  useEffect(() => {
+    if (!activeChatId) {
+      setPinnedMessage(null);
+      return;
+    }
+    try {
+      const stored = localStorage.getItem(`oceangram-pinned-${activeChatId}`);
+      if (stored) setPinnedMessage(JSON.parse(stored));
+      else setPinnedMessage(null);
+    } catch (_) {
+      setPinnedMessage(null);
+    }
+  }, [activeChatId]);
+
+  useEffect(() => {
+    const handlePin = (event) => {
+      const { message, chatId } = event.detail || {};
+      if (chatId === activeChatId && message) {
+        setPinnedMessage(message);
+        try {
+          localStorage.setItem(`oceangram-pinned-${chatId}`, JSON.stringify(message));
+        } catch (_) {}
+      }
+    };
+    window.addEventListener("oceangram:pin-message", handlePin);
+    return () => window.removeEventListener("oceangram:pin-message", handlePin);
+  }, [activeChatId]);
+
+  const handleUnpin = (e) => {
+    e.stopPropagation();
+    setPinnedMessage(null);
+    try {
+      localStorage.removeItem(`oceangram-pinned-${activeChatId}`);
+    } catch (_) {}
+  };
+
+  const handleScrollToPinned = () => {
+    if (!pinnedMessage?.id) return;
+    const el = document.getElementById(`msg-${pinnedMessage.id}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("ring-2", "ring-sky-400");
+      setTimeout(() => el.classList.remove("ring-2", "ring-sky-400"), 2000);
+    }
+  };
   const MEDIA_CACHE_VERSION = 1;
   const MEDIA_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
   const VIDEO_POSTER_CACHE_KEY = MEDIA_POSTER_CACHE_KEY;
@@ -1476,6 +1525,35 @@ export default function ChatWindowPanel({
             )}
             </div>
           </div>
+
+          {pinnedMessage ? (
+            <div
+              onClick={handleScrollToPinned}
+              className="sticky top-0 z-20 flex items-center justify-between border-b border-sky-400/20 bg-white/90 dark:bg-slate-900/90 px-4 py-2 backdrop-blur-md transition-all hover:bg-sky-50/80 dark:hover:bg-slate-800/80 cursor-pointer select-none shadow-xs"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-500">
+                  <Pin size={15} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                    {t("pinned_message", "Pinned Message")}
+                  </div>
+                  <div className="truncate text-xs text-slate-700 dark:text-slate-200">
+                    {String(pinnedMessage?.body || pinnedMessage?.summaryText || "Attachment")}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleUnpin}
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                title="Unpin"
+              >
+                <Close size={14} />
+              </button>
+            </div>
+          ) : null}
         </>
       ) : null}
 

@@ -1,3 +1,21 @@
+## 1.4.0 - Full Telegram Parity: Pinned Messages & Chats, Location Sharing, Sticker Picker & Chat Folders
+
+### 📌 Pinned Messages & Pinned Chats
+- 📍 Added persistent Telegram-style **Pinned Message Banner** to chat header with smooth scroll-to-message jump and unpin control
+- 🔝 Added **Pin to Top** in chat context menus with persistent sorting at the top of the chat list and pin indicator badges
+
+### 🗺️ Live Location Sharing
+- 📍 Added **Location Sharing** option to attachment menu using `navigator.geolocation`
+- 🗺️ Generates interactive OpenStreetMap coordinate markers directly inside messages
+
+### 😊 Telegram Emoji & Sticker Picker
+- 🎭 Added dedicated popup panel with categorized emojis (Smileys, Gestures, Hearts, Ocean)
+- 🚀 Includes Telegram-style graphic stickers (`🌊`, `🐳`, `❤️‍🔥`, `🎉`, `🚀`, `😎`, `🤯`, `💎`, `👑`) with single-tap instant sending
+
+### 📁 Telegram-Style Chat Folders
+- 📂 Added responsive folder tabs across the top of the chat list: **All**, **Personal**, **Groups**, and **Channels**
+- ⚡ Real-time filtering with badge counters and animated tab switching
+
 ## 1.3.0 - Telegram-Grade Sound & Vibration Alerts, Full Multi-Language System & 3D Logo Overhaul
 
 ### 🔔 SMS & Telegram-Style Notification Alerts

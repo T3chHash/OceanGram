@@ -12,6 +12,7 @@ import {
   Bookmark,
   Megaphone,
   Phone,
+  Pin,
   Users,
   VolumeX,
   Video,
@@ -27,6 +28,8 @@ import {
 } from "../../../utils/messageContent.js";
 import { isMessageAuthoredByUser } from "../../../utils/messageOwnership.js";
 import { formatCompactCount } from "../../../utils/chatFormat.js";
+import { usePinnedChats } from "../../../utils/pinnedChatsStore.js";
+import { useI18n } from "../../../utils/i18n.js";
 import Avatar from "../../common/Avatar.jsx";
 import UserRoleBadge from "../../common/UserRoleBadge.jsx";
 import VerifiedBadge from "../../common/VerifiedBadge.jsx";
@@ -145,11 +148,34 @@ export default function ChatsListPanel({
     (Array.isArray(discoverGroups) && discoverGroups.length > 0) ||
     (Array.isArray(discoverChannels) && discoverChannels.length > 0) ||
     Boolean(discoverSaved);
+  const [activeFolder, setActiveFolder] = useState("all");
+  const { pinnedIds, isChatPinned } = usePinnedChats();
+  const { t } = useI18n();
+
+  const filteredAndSortedChats = useMemo(() => {
+    let list = visibleChats || [];
+    if (activeFolder === "personal") {
+      list = list.filter((c) => c?.type === "dm" || c?.type === "saved");
+    } else if (activeFolder === "groups") {
+      list = list.filter((c) => c?.type === "group");
+    } else if (activeFolder === "channels") {
+      list = list.filter((c) => c?.type === "channel");
+    }
+    // Sort pinned chats to top
+    return [...list].sort((a, b) => {
+      const aPinned = pinnedIds.includes(String(a.id));
+      const bPinned = pinnedIds.includes(String(b.id));
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      return 0;
+    });
+  }, [visibleChats, activeFolder, pinnedIds]);
+
   const sidebarChats = useMemo(() => {
     if (showSearchMode) return visibleChats;
     const safeLimit = Math.max(SIDEBAR_INITIAL_RENDER, renderLimit);
-    return visibleChats.slice(0, safeLimit);
-  }, [renderLimit, showSearchMode, visibleChats]);
+    return filteredAndSortedChats.slice(0, safeLimit);
+  }, [renderLimit, showSearchMode, filteredAndSortedChats, visibleChats]);
 
   useEffect(() => {
     if (showSearchMode) return;
@@ -510,6 +536,33 @@ export default function ChatsListPanel({
           ) : null}
         </div>
       ) : null}
+      {!showSearchMode ? (
+        <div className="flex items-center gap-1.5 overflow-x-auto px-3 py-1.5 scrollbar-none border-b border-slate-200/50 dark:border-white/5 mb-1 bg-slate-50/60 dark:bg-slate-900/60 backdrop-blur-xs">
+          {[
+            { id: "all", label: t("all_chats", "All") },
+            { id: "personal", label: t("personal_chats", "Personal") },
+            { id: "groups", label: t("groups", "Groups") },
+            { id: "channels", label: t("channels", "Channels") },
+          ].map((tab) => {
+            const active = activeFolder === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveFolder(tab.id)}
+                className={`flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-semibold transition cursor-pointer ${
+                  active
+                    ? "bg-sky-500 text-white shadow-xs"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
       {!showSearchMode && loadingChats && !visibleChats.length ? (
         Array.from({ length: 6 }).map((_, index) => (
           <div
@@ -815,6 +868,9 @@ export default function ChatsListPanel({
                   </div>
                   <div className="ml-auto flex min-w-[58px] shrink-0 flex-col items-end gap-1.5 self-start">
                     <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                      {isChatPinned(conv.id) ? (
+                        <Pin size={12} className="text-sky-500 rotate-45 shrink-0" />
+                      ) : null}
                       {isOwnLastMessage && !isChannelOwner ? (
                         <span
                           className={`inline-flex items-center ${

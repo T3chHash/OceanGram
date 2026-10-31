@@ -7,6 +7,7 @@ import {
   Download,
   Forward,
   Pencil,
+  Pin,
   Reply,
   Trash,
   User,
@@ -14,6 +15,7 @@ import {
   VolumeX,
 } from "../../icons/lucide.js";
 import { copyTextToClipboard } from "../../utils/clipboard.js";
+import { isChatPinned, togglePinChat } from "../../utils/pinnedChatsStore.js";
 import {
   extractMessageBodyText,
   getMessageFiles,
@@ -159,6 +161,20 @@ export function useAppContextMenu({
             ? []
             : [
                 {
+                  id: "pin",
+                  label: "Pin message",
+                  icon: Pin,
+                  onSelect: () => {
+                    if (typeof window !== "undefined") {
+                      window.dispatchEvent(
+                        new CustomEvent("oceangram:pin-message", {
+                          detail: { message, chatId: activeChatId },
+                        }),
+                      );
+                    }
+                  },
+                },
+                {
                   id: "forward",
                   label: "Forward",
                   icon: Forward,
@@ -236,6 +252,13 @@ export function useAppContextMenu({
           });
         }
         if (String(chat?.type || "").toLowerCase() !== "saved") {
+          const pinned = isChatPinned(chat?.id);
+          items.push({
+            id: "pin-chat",
+            label: pinned ? "Unpin from top" : "Pin to top",
+            icon: Pin,
+            onSelect: () => togglePinChat(chat?.id),
+          });
           items.push({
             id: "mute",
             label: chat?._muted ? "Unmute" : "Mute",
